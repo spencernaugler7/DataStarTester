@@ -482,3 +482,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# mvc lib folder. these are tracked in libman.json
+*/wwwroot/.lib/
