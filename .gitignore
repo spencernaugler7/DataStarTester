@@ -484,4 +484,4 @@ $RECYCLE.BIN/
 *.swp
 
 # mvc lib folder. these are tracked in libman.json
-*/wwwroot/.lib/
+*/wwwroot/lib/*
