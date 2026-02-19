@@ -15,6 +15,9 @@ namespace DataStarTester.Views.Home
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Output { get; init; } = null;
 
+        [JsonPropertyName("todoCount")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? TodoCount { get; init; } = null;
         //public string Serialize() => ...
     }
 
@@ -54,8 +57,8 @@ namespace DataStarTester.Views.Home
             {
                 string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
                 await dataStarService.PatchElementsAsync(/*lang=html*/$"""
-                <div id='target'><span id='date'><b>{today}</b><button data-on:click="@get('/removeDate')">Remove</button></span></div>
-            """);
+                    <div id='target'><span id='date'><b>{today}</b><button data-on:click="@get('/removeDate')">Remove</button></span></div>
+                """);
             });
 
             app.MapGet("/removeDate", async (IDatastarService dataStarService) =>
@@ -88,38 +91,25 @@ namespace DataStarTester.Views.Home
 
         private static RouteGroupBuilder RegisterTodoActions(this RouteGroupBuilder group)
         {
+            group.MapGet("/init", async (IDatastarService dataStarService) => {
 
-            static string RenderTodoActions(List<Todo> TodoState) => $"""
-                <span>
-                    <strong>{TodoState.Count(w => w.Done == false)}</strong> items pending
-                </span>
-                <button class="small info" data-on:click="@@put('/examples/todomvc/mode/0')">
-                    All
-                </button>
-                <button class="small" data-on:click="@@put('/examples/todomvc/mode/1')">
-                    Pending
-                </button>
-                <button class="small" data-on:click="@@put('/examples/todomvc/mode/2')">
-                    Completed
-                </button>
-                <button class="error small" aria-disabled="true">
-                    Delete
-                </button>
-                <button class="warning small" data-on:click="@@put('/examples/todomvc/reset')">
-                    Reset
-                </button>
-            """;
+                await dataStarService.PatchElementsAsync($"""
+                    <ul id="todo-list" style="">
+                        {string.Join("\n", TodoEntities.DefaultTodos.Select(TodoActions.RenderTodo))}
+                    </ul>
+                """);
 
-            group.MapGet("/updates", async (IDatastarService dataStarService) => await dataStarService.PatchElementsAsync($"""
-            <ul id="todo-list" style="">
-                {string.Join("\n", TodoEntities.DefaultTodos.Select(TodoActions.RenderTodo))}
-            </ul>
-            <div id="todo-actions">
-                {RenderTodoActions(TodoEntities.DefaultTodos)}
-            </div>
-        """));
+                // update our todo count
+                var signals = await dataStarService.ReadSignalsAsync<MySignals>();
+                var newSignals = signals with { TodoCount = TodoEntities.DefaultTodos.Count(w => w.Done == false) };
+                await dataStarService.PatchSignalsAsync(newSignals);
+            });
 
-            group.MapPut("/mode/{id}", async () => "blah");
+            group.MapPut("{todoId}", async (int todoId, IDatastarService datastarService) =>
+            {
+
+            });
+            group.MapPut("/mode/{modeId}", async (int modeId) => "blah");
             group.MapPut("/blah", async () => "blah");
             group.MapPut("/reset", async () => "blah");
             return group;

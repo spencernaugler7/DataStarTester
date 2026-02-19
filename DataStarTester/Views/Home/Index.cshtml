@@ -25,7 +25,7 @@
 <br />
 
 <!-- little test todo app -->
-<section id="todomvc" data-init="@@get('/examples/todomvc/updates')">
+<section id="todomvc" data-signals="{ todoCount: 0 }" data-init="@@get('/examples/todomvc/init')">
     <header id="todo-header">
         <input type="checkbox" data-on:click__prevent="@@post('/examples/todomvc/-1/toggle')" data-init="el.checked = false" />
         <input id="new-todo"
@@ -40,7 +40,7 @@
     </ul>
     <div id="todo-actions">
         <span>
-            <strong>0</strong> items pending
+            <strong data-text="$todoCount">0</strong> items pending
         </span>
         <button class="small info" data-on:click="@@put('/examples/todomvc/mode/0')">
             All
