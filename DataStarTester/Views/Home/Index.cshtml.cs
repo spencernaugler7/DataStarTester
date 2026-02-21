@@ -1,6 +1,5 @@
-﻿using DataStarTester.Views.Home.TodosNamespace;
-using Microsoft.AspNetCore.Components.Forms;
-using StarFederation.Datastar.DependencyInjection;
+﻿using StarFederation.Datastar.DependencyInjection;
+using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
 namespace DataStarTester.Views.Home
@@ -15,34 +14,37 @@ namespace DataStarTester.Views.Home
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Output { get; init; } = null;
 
-        [JsonPropertyName("todoCount")]
+        [JsonPropertyName("todoInput")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? TodoCount { get; init; } = null;
-        //public string Serialize() => ...
+        public string? TodoInput { get; init; } = null;
     }
 
-    namespace TodosNamespace
+
+    public static class TodoBusinessLogic
     {
-        public record Todo(bool Done, string Description);
+        public record Todo(int Id, bool Done, string Description);
 
-        public static class TodoEntities
+        public static string RenderTodo(this Todo todo) => $"""
+            <div style="display: flex; flex-direction: row; gap: 5px;">
+            <input type="checkbox" {(todo.Done ? "checked" : "")} data-on:change="@post('/update'" />
+            <textbox>{todo.Description}</textbox>
+            </div>
+        """;
+
+        public static Todo NewTodo(string TodoInput)
         {
-            public static readonly List<Todo> DefaultTodos =
-            [
-                new(false, "Finish code"),
-                new(true, "Finish Writeup")
-            ];
+            int maxId = Todos.Max(s => s.Id);
+            int newId = maxId++;
+
+            var newTodo = new Todo(newId, false, TodoInput);
+            return newTodo;
         }
 
-        public static class TodoActions
-        {
-            public static string RenderTodo(Todo todo) => $"""
-                <div style="display: flex; flex-direction: row; gap: 5px;">
-                <input type="checkbox" {(todo.Done ? "checked" : "")} data-on:change="@post('/update'" />
-                <textbox>{todo.Description}</textbox>
-                </div>
-            """;
-        }
+        public static ImmutableList<Todo> Todos =
+        [
+            new(0, false, "Finish code"),
+            new(1, true, "Finish Writeup")
+        ];
     }
 
     public static class IndexEndpoints
@@ -92,28 +94,40 @@ namespace DataStarTester.Views.Home
         private static RouteGroupBuilder RegisterTodoActions(this RouteGroupBuilder group)
         {
             group.MapGet("/init", async (IDatastarService dataStarService) => {
-
-                await dataStarService.PatchElementsAsync($"""
-                    <ul id="todo-list" style="">
-                        {string.Join("\n", TodoEntities.DefaultTodos.Select(TodoActions.RenderTodo))}
-                    </ul>
-                """);
-
-                // update our todo count
-                var signals = await dataStarService.ReadSignalsAsync<MySignals>();
-                var newSignals = signals with { TodoCount = TodoEntities.DefaultTodos.Count(w => w.Done == false) };
-                await dataStarService.PatchSignalsAsync(newSignals);
+                var ui = UpdateUi(TodoBusinessLogic.Todos);
+                await dataStarService.PatchElementsAsync(ui);
             });
 
-            group.MapPut("{todoId}", async (int todoId, IDatastarService datastarService) =>
+            group.MapPut("/{todoId}", async (int todoId, IDatastarService datastarService) =>
             {
+                var signals = await datastarService.ReadSignalsAsync<MySignals>();
+                if (todoId == -1)
+                {
+                    TodoBusinessLogic.Todo newTodo = TodoBusinessLogic.NewTodo(signals.TodoInput);
+                    TodoBusinessLogic.Todos = TodoBusinessLogic.Todos.Append(newTodo).ToImmutableList();
+                }
+                var newUi = UpdateUi(TodoBusinessLogic.Todos);
 
+                await datastarService.PatchElementsAsync(newUi);
             });
-            group.MapPut("/mode/{modeId}", async (int modeId) => "blah");
-            group.MapPut("/blah", async () => "blah");
-            group.MapPut("/reset", async () => "blah");
+
+            // group.MapPut("/mode/{modeId}", async (int modeId) => "blah");
+            // group.MapPut("/blah", async () => "blah");
+            // group.MapPut("/reset", async () => "blah");
             return group;
         }
+
+        private static string UpdateUi(ImmutableList<TodoBusinessLogic.Todo> todos)
+        {
+            var todoCount = todos.Count(w => w.Done == false);
+            return $"""
+                <ul id="todo-list" style="">
+                    {string.Join("\n", todos.Select(s => s.RenderTodo()))}
+                </ul>
+                <strong id="todoCount">{todoCount}</strong>
+            """;
+        }
+
         #endregion
     }
 }

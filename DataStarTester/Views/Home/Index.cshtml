@@ -25,22 +25,21 @@
 <br />
 
 <!-- little test todo app -->
-<section id="todomvc" data-signals="{ todoCount: 0 }" data-init="@@get('/examples/todomvc/init')">
+<section id="todomvc" data-init="@@get('/examples/todomvc/init')">
     <header id="todo-header">
         <input type="checkbox" data-on:click__prevent="@@post('/examples/todomvc/-1/toggle')" data-init="el.checked = false" />
         <input id="new-todo"
                type="text"
                placeholder="What needs to be done?"
-               data-signals:todo-input
                data-bind:todo-input
-               data-on:keydown="evt.key === 'Enter' && $todoInput.trim() && @@patch('/examples/todomvc/-1') && ($todoInput = '');" />
+               data-on:keydown="evt.key === 'Enter' && $todoInput.trim() && @@put('/examples/todomvc/-1') && ($todoInput = '');" />
     </header>
     <ul id="todo-list">
         <!-- Todo items are dynamically rendered here -->
     </ul>
     <div id="todo-actions">
         <span>
-            <strong data-text="$todoCount">0</strong> items pending
+            <strong id="todoCount">0</strong> items pending
         </span>
         <button class="small info" data-on:click="@@put('/examples/todomvc/mode/0')">
             All
