@@ -31,12 +31,12 @@ namespace DataStarTester.Views.Home
             </div>
         """;
 
-        public static Todo NewTodo(string TodoInput)
+        public static Todo NewTodo(string todoInput)
         {
             int maxId = Todos.Max(s => s.Id);
             int newId = maxId++;
 
-            var newTodo = new Todo(newId, false, TodoInput);
+            var newTodo = new Todo(newId, false, todoInput);
             return newTodo;
         }
 
@@ -98,17 +98,17 @@ namespace DataStarTester.Views.Home
                 await dataStarService.PatchElementsAsync(ui);
             });
 
-            group.MapPut("/{todoId}", async (int todoId, IDatastarService datastarService) =>
+            group.MapPut("/{todoId:int}", async (int todoId, IDatastarService dataStarService) =>
             {
-                var signals = await datastarService.ReadSignalsAsync<MySignals>();
+                var signals = await dataStarService.ReadSignalsAsync<MySignals>();
                 if (todoId == -1)
                 {
-                    TodoBusinessLogic.Todo newTodo = TodoBusinessLogic.NewTodo(signals.TodoInput);
+                    var newTodo = TodoBusinessLogic.NewTodo(signals.TodoInput);
                     TodoBusinessLogic.Todos = TodoBusinessLogic.Todos.Append(newTodo).ToImmutableList();
                 }
                 var newUi = UpdateUi(TodoBusinessLogic.Todos);
 
-                await datastarService.PatchElementsAsync(newUi);
+                await dataStarService.PatchElementsAsync(newUi);
             });
 
             // group.MapPut("/mode/{modeId}", async (int modeId) => "blah");
@@ -119,7 +119,7 @@ namespace DataStarTester.Views.Home
 
         private static string UpdateUi(ImmutableList<TodoBusinessLogic.Todo> todos)
         {
-            var todoCount = todos.Count(w => w.Done == false);
+            var todoCount = todos.Count(w => !w.Done);
             return $"""
                 <ul id="todo-list" style="">
                     {string.Join("\n", todos.Select(s => s.RenderTodo()))}
