@@ -12,12 +12,13 @@
 
 <!-- test form controls -->
 <main class="container" id="main" data-signals="{'formInput':'', 'output':'empty' }">
+    <h1>Form Test</h1>
     <button data-on:click="@@get('/displayDate')">Display Date</button>
     <div id="target"></div>
-    <br />
-    <input type="text" placeholder="input:" data-bind:form-input data-on:keyup="@@post('/changeOutput')" /><br />
+    <br/>
+    <input type="text" placeholder="input:" data-bind:form-input data-on:keyup="@@post('/changeOutput')"/><br/>
     <span data-text="$output"></span>
-    <br />
+    <br/>
     <button data-on:click="@@post('/resetInput')">Revert signals</button>
 </main>
 
@@ -26,13 +27,14 @@
 
 <!-- little test todo app -->
 <section id="todomvc" data-init="@@get('/examples/todomvc/init')">
+    <h1>Todo App</h1>
     <header id="todo-header">
-        <input type="checkbox" data-on:click__prevent="@@post('/examples/todomvc/-1/toggle')" data-init="el.checked = false" />
+        <input type="checkbox" data-on:click__prevent="@@post('/examples/todomvc/-1/toggle')" data-init="el.checked = false"/>
         <input id="new-todo"
                type="text"
                placeholder="What needs to be done?"
                data-bind:todo-input
-               data-on:keydown="evt.key === 'Enter' && $todoInput.trim() && @@put('/examples/todomvc/-1') && ($todoInput = '');" />
+               data-on:keydown="evt.key === 'Enter' && $todoInput.trim() && @@put('/examples/todomvc/-1') && ($todoInput = '');"/>
     </header>
     <ul id="todo-list">
         <!-- Todo items are dynamically rendered here -->
@@ -57,5 +59,5 @@
             Reset
         </button>
     </div>
-    <input type="text" data-bind:counter-text data-on-interval__duration.500ms="$counterText++" value="1"></input>
+    <input type="text" data-bind:counter-text data-on-interval__duration.500ms="$counterText++" value="1"/>
 </section>
