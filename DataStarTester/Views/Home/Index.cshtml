@@ -11,7 +11,7 @@
 <pre data-json-signals></pre>
 
 <!-- test form controls -->
-<main class="container" id="main" data-signals="{'formInput':'', 'output':'empty' }">
+<main class="container" id="main" data-signals="{'formInput':'', 'output':'Type in input to get output' }">
     <h1>Form Test</h1>
     <button data-on:click="@@get('/displayDate')">Display Date</button>
     <div id="target"></div>
@@ -59,7 +59,7 @@
             <button class="warning small" data-on:click="@@put('/examples/todomvc/reset')">
                 Reset
             </button>
-#        </div>
+        </div>
     </div>
     <input type="text" data-bind:counter-text data-on-interval__duration.500ms="$counterText++" value="1"/>
 </section>

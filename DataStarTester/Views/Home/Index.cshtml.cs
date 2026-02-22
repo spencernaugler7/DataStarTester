@@ -49,8 +49,9 @@ public static class IndexEndpoints
 
         app.MapPost("/changeOutput", async (IDatastarService dataStarService) =>
         {
-            MySignals signals = await dataStarService.ReadSignalsAsync<MySignals>();
-            MySignals newSignals = new() { Output = $"Your input: {signals.FormInput}" };
+            var signals = await dataStarService.ReadSignalsAsync<MySignals>();
+            var output = string.IsNullOrEmpty(signals.FormInput) ? "Type in input to get output" : $"Your input {signals.FormInput}";
+            MySignals newSignals = new() { Output = output };
             await dataStarService.PatchSignalsAsync(newSignals);
         });
 
