@@ -67,12 +67,14 @@ public static class IndexEndpoints
 
         todoGroup.MapPut("/{todoId:int}", async (int todoId, IDatastarService dataStarService) =>
         {
-           var signals = await dataStarService.ReadSignalsAsync<MySignals>();
-           if (todoId == -1) 
-               InMemoryDb.CurrentState = TodoBl.UpdateState(InMemoryDb.CurrentState, new TodoBl.AddTodoMessage(signals.TodoInput));
-           var newUi = ViewUi(InMemoryDb.CurrentState);
-           
-           await dataStarService.PatchElementsAsync(newUi);
+            var signals = await dataStarService.ReadSignalsAsync<MySignals>();
+            var newMessage = todoId switch
+            {
+                -1 => new TodoBl.AddTodoMessage(signals.TodoInput)
+            };
+            
+            InMemoryDb.CurrentState = TodoBl.UpdateState(InMemoryDb.CurrentState, newMessage);
+            await dataStarService.PatchElementsAsync(TodoBl.ViewUi(InMemoryDb.CurrentState));
         });
 
         todoGroup.MapPut("/mode/{modeId:int}", async (int modeId) =>
@@ -86,25 +88,9 @@ public static class IndexEndpoints
 
     private static async Task InitializeUi(IDatastarService dataStarService)
     {
-        var ui = ViewUi(InMemoryDb.CurrentState);
+        var ui = TodoBl.ViewUi(InMemoryDb.CurrentState);
         await dataStarService.PatchElementsAsync(ui);
     }
-
-    private static string ViewUi(TodoBl.TodoState state) =>
-        /*lang=html*/$"""
-                          <ul id="todo-list" style="">
-                              {string.Join("\n", state.Todos.Select(RenderTodo))}
-                          </ul>
-                          <strong id="todoCount">{state.Todos.Count(c => !c.Done)}</strong>
-                      """;
-
-    private static string RenderTodo(TodoBl.Todo todo) => 
-        /*lang=html*/$"""
-                          <div style="display: flex; flex-direction: row; gap: 5px;">
-                              <input type="checkbox" {(todo.Done ? "checked" : "")} data-on:change="@post('/update')" />
-                              <textbox>{todo.Description}</textbox>
-                          </div>
-                      """;
         
     #endregion
 }
