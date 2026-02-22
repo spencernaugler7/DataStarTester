@@ -1,6 +1,7 @@
 ﻿using StarFederation.Datastar.DependencyInjection;
 using System.Text.Json.Serialization;
 using DataStarTester.Models.Todos;
+using StarFederation.Datastar.ModelBinding;
 
 namespace DataStarTester.Views.Home;
 
@@ -17,6 +18,9 @@ public record MySignals
     [JsonPropertyName("todoInput")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? TodoInput { get; init; }
+
+    [JsonPropertyName("todoDone")]
+    public bool TodoDone { get; init; }
 }
 
 public static class InMemoryDb
@@ -63,34 +67,46 @@ public static class IndexEndpoints
     {
         var todoGroup = app.MapGroup("/examples/todomvc");
            
-        todoGroup.MapGet("/init", async (IDatastarService dataStarService) => { await InitializeUi(dataStarService); });
+        todoGroup.MapGet("/init", async (IDatastarService dataStarService) => 
+        {         
+            var ui = TodoBl.GetElementPatches(InMemoryDb.CurrentState);
+            await dataStarService.PatchElementsAsync(ui); 
+        });
 
         todoGroup.MapPut("/{todoId:int}", async (int todoId, IDatastarService dataStarService) =>
         {
             var signals = await dataStarService.ReadSignalsAsync<MySignals>();
-            var newMessage = todoId switch
+            var message = todoId switch
             {
-                -1 => new TodoBl.AddTodoMessage(signals.TodoInput)
+                -1 => new TodoBl.AddTodoMessage(signals.TodoInput, signals.TodoDone)
             };
-            
-            InMemoryDb.CurrentState = TodoBl.UpdateState(InMemoryDb.CurrentState, newMessage);
-            await dataStarService.PatchElementsAsync(TodoBl.ViewUi(InMemoryDb.CurrentState));
+
+            await UpdateUi(message, dataStarService);
         });
 
-        todoGroup.MapPut("/mode/{modeId:int}", async (int modeId) =>
+        todoGroup.MapPut("/mode/{modeId:int}", async (int modeId, IDatastarService datastarService) =>
         {
-            
+            TodoBl.Message message = modeId switch
+            {
+                0 => new TodoBl.ViewAllTodos(),
+                1 => new TodoBl.ViewPendingTodos(),
+                2 => new TodoBl.ViewCompletedTodos(),
+                _ => new TodoBl.ViewAllTodos()
+            };
+            await UpdateUi(message, datastarService);
         });
             
-        // group.MapPut("/blah", async () => "blah");
-        // group.MapPut("/reset", async () => "blah");
+        todoGroup.MapPut("/toggle/{todoId:int}", async (int todoId, IDatastarService datastarService) => 
+        {
+            await UpdateUi(new TodoBl.ToggleTodo(todoId), datastarService);
+        });
     }
 
-    private static async Task InitializeUi(IDatastarService dataStarService)
+    private static async Task UpdateUi(TodoBl.Message message, IDatastarService datastarService)
     {
-        var ui = TodoBl.ViewUi(InMemoryDb.CurrentState);
-        await dataStarService.PatchElementsAsync(ui);
+        InMemoryDb.CurrentState = TodoBl.UpdateState(InMemoryDb.CurrentState, message);
+        var patches = TodoBl.GetElementPatches(InMemoryDb.CurrentState);
+        await datastarService.PatchElementsAsync(patches);
     }
-        
     #endregion
 }
