@@ -2,18 +2,13 @@
   "name": "datastartester",
   "type": "module",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "latest",
-    "daisyui": "^5.5.19"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
   "dependencies": {
-    "@tailwindcss/cli": "^4.2.0",
-    "tailwindcss": "^4.2.0"
+    "@tailwindcss/cli": "^4.0.0",
+    "daisyui": "^5.5.19",
+    "tailwindcss": "^4.0.0"
   },
   "scripts": {
-    "css:build": "bunx @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --minify"
+    "css:build": "bun x @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --minify",
+    "css:watch": "bun x @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --minify --watch"
   }
 }

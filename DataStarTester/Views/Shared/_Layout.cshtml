@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,9 +9,9 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script type="module" src="~/js/data-star.min.js"></script>
 </head>
-<body class="bg-grey-950">
-    <div class="navbar bg-grey-950 shadow-sm">
-        <div class="flex-1 bg-grey-950">
+<body>
+    <div class="navbar shadow-sm">
+        <div class="flex-1">
             <a class="btn btn-ghost text-xl text-white" asp-area="" asp-controller="Home" asp-action="Index">DataStarTester</a>
         </div>
         <ul class="menu menu-horizontal px-1">
@@ -32,14 +32,14 @@
             </li>
         </ul>
     </div>
-    <div class="bg-gray-950">
+    <div>
         <main role="main" class="p-30">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="bg-grey-950">
-        <div class="container">
+    <footer>
+        <div>
             &copy; 2026 - DataStarTester - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
