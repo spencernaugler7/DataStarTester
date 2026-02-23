@@ -5,41 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - DataStarTester</title>
     <script type="importmap"></script>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/data-star.min.js"></script>
 </head>
-<body>
-    <div class="navbar bg-base-100 shadow-sm">
-        <div class="flex-1">
-            <a class="btn btn-ghost text-xl" asp-area="" asp-controller="Home" asp-action="Index">DataStarTester</a>
+<body class="bg-grey-950">
+    <div class="navbar bg-grey-950 shadow-sm">
+        <div class="flex-1 bg-grey-950">
+            <a class="btn btn-ghost text-xl text-white" asp-area="" asp-controller="Home" asp-action="Index">DataStarTester</a>
         </div>
         <ul class="menu menu-horizontal px-1">
-            <li class="nav-item">
-                <a class="text-black-900" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            <li>
+                <a class="text-white" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/home.svg" height="25" width="25" />
+                    Home
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="text-black-900" asp-area="" asp-controller="Home" asp-action="Sample">Sample</a>
+            <li>
+                <a class="text-white" asp-area="" asp-controller="Home" asp-action="Sample">
+                    <img src="~/images/info.svg" height="25" width="25" />
+                    Sample
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="text-black-900" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <li>
+                <a class="text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
             </li>
         </ul>
     </div>
-    <div class="container">
+    <div class="bg-gray-950">
         <main role="main" class="p-30">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="bg-grey-950">
         <div class="container">
             &copy; 2026 - DataStarTester - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script type="module" src="~/js/data-star.min.js"></script>
-    <script src="https://unpkg.com/@@tailwindcss/browser@4"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
