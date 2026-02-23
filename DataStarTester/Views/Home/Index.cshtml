@@ -3,17 +3,20 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="text-9xl">Welcome</h1>
+    <p class="text-2xl">Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
 <!-- shows all signals propigated in the page -->
 <pre data-json-signals></pre>
 
+<br />
+<br />
+
 <!-- test form controls -->
-<main class="container" id="main" data-signals="{'formInput':'', 'output':'Type in input to get output' }">
-    <h1>Form Test</h1>
-    <button data-on:click="@@get('/displayDate')">Display Date</button>
+<main class="card" id="main" data-signals="{'formInput':'', 'output':'Type in input to get output' }">
+    <h1 class="text-2xl">Form Test</h1>
+    <button class="btn" data-on:click="@@get('/displayDate')">Display Date</button>
     <div id="target"></div>
     <br/>
     <input type="text" placeholder="input:" data-bind:form-input data-on:keyup="@@post('/changeOutput')"/><br/>
