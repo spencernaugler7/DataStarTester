@@ -31,7 +31,7 @@ public static class InMemoryDb
 public static class IndexEndpoints
 {
     #region SignalsTest
-    private static readonly MySignals defaultSignals = new() { FormInput = "", Output = "empty" };
+    private static MySignals DefaultSignals { get; } = new() { FormInput = "", Output = "empty" };
 
     [RegisterEndpoint]
     public static void RegisterIndexMainEndpoints(WebApplication app)
@@ -57,7 +57,7 @@ public static class IndexEndpoints
 
         app.MapPost("/resetInput", async (IDatastarService dataStarService) =>
         {
-            await dataStarService.PatchSignalsAsync(defaultSignals);
+            await dataStarService.PatchSignalsAsync(DefaultSignals);
         });
     }
     #endregion
