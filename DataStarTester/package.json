@@ -3,9 +3,9 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@tailwindcss/cli": "^4.0.0",
+    "@tailwindcss/cli": "^4.2.2",
     "daisyui": "^5.5.19",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.2.2"
   },
   "scripts": {
     "css:build": "bun x @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/output.css --minify",
