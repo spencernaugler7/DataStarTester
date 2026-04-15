@@ -1,11 +1,10 @@
 ﻿using StarFederation.Datastar.DependencyInjection;
 using System.Text.Json.Serialization;
 using DataStarTester.Models.Todos;
-using StarFederation.Datastar.ModelBinding;
 
 namespace DataStarTester.Views.Home;
 
-public record MySignals
+public record IndexSignals
 {
     [JsonPropertyName("formInput")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -14,13 +13,6 @@ public record MySignals
     [JsonPropertyName("output")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Output { get; init; }
-
-    [JsonPropertyName("todoInput")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? TodoInput { get; init; }
-
-    [JsonPropertyName("todoDone")]
-    public bool TodoDone { get; init; }
 }
 
 public static class InMemoryDb
@@ -30,8 +22,7 @@ public static class InMemoryDb
 
 public static class IndexEndpoints
 {
-    #region SignalsTest
-    private static MySignals DefaultSignals { get; } = new() { FormInput = "", Output = "empty" };
+    private static IndexSignals DefaultSignals { get; } = new() { FormInput = "", Output = "empty" };
 
     [RegisterEndpoint]
     public static void RegisterIndexMainEndpoints(WebApplication app)
@@ -49,9 +40,9 @@ public static class IndexEndpoints
 
         app.MapPost("/changeOutput", async (IDatastarService dataStarService) =>
         {
-            var signals = await dataStarService.ReadSignalsAsync<MySignals>();
+            var signals = await dataStarService.ReadSignalsAsync<IndexSignals>();
             var output = string.IsNullOrEmpty(signals.FormInput) ? "Type in input to get output" : $"Your input {signals.FormInput}";
-            MySignals newSignals = new() { Output = output };
+            IndexSignals newSignals = new() { Output = output };
             await dataStarService.PatchSignalsAsync(newSignals);
         });
 
@@ -60,54 +51,4 @@ public static class IndexEndpoints
             await dataStarService.PatchSignalsAsync(DefaultSignals);
         });
     }
-    #endregion
-
-    #region Todo
-    [RegisterEndpoint]
-    public static void RegisterIndexTodoEndpoints(WebApplication app)
-    {
-        var todoGroup = app.MapGroup("/examples/todomvc");
-           
-        todoGroup.MapGet("/init", async (IDatastarService dataStarService) => 
-        {         
-            var ui = TodoBl.GetElementPatches(InMemoryDb.CurrentState);
-            await dataStarService.PatchElementsAsync(ui); 
-        });
-
-        todoGroup.MapPut("/{todoId:int}", async (int todoId, IDatastarService dataStarService) =>
-        {
-            var signals = await dataStarService.ReadSignalsAsync<MySignals>();
-            var message = todoId switch
-            {
-                -1 => new TodoBl.AddTodoMessage(signals.TodoInput, signals.TodoDone)
-            };
-
-            await UpdateUi(message, dataStarService);
-        });
-
-        todoGroup.MapPut("/mode/{modeId:int}", async (int modeId, IDatastarService datastarService) =>
-        {
-            TodoBl.Message message = modeId switch
-            {
-                0 => new TodoBl.ViewAllTodos(),
-                1 => new TodoBl.ViewPendingTodos(),
-                2 => new TodoBl.ViewCompletedTodos(),
-                _ => new TodoBl.ViewAllTodos()
-            };
-            await UpdateUi(message, datastarService);
-        });
-            
-        todoGroup.MapPut("/toggle/{todoId:int}", async (int todoId, IDatastarService datastarService) => 
-        {
-            await UpdateUi(new TodoBl.ToggleTodo(todoId), datastarService);
-        });
-    }
-
-    private static async Task UpdateUi(TodoBl.Message message, IDatastarService datastarService)
-    {
-        InMemoryDb.CurrentState = TodoBl.UpdateState(InMemoryDb.CurrentState, message);
-        var patches = TodoBl.GetElementPatches(InMemoryDb.CurrentState);
-        await datastarService.PatchElementsAsync(patches);
-    }
-    #endregion
 }
