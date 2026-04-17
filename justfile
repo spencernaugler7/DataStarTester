@@ -12,3 +12,9 @@ alias bs := build-styles
 build-styles:
     @echo building styles
     bun run css:build
+
+alias b := build
+[working-directory: './DataStarTester.AppHost']
+build:
+    @echo building mvc application
+    dotnet build 
