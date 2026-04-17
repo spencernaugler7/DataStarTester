@@ -1,6 +1,5 @@
 ﻿using StarFederation.Datastar.DependencyInjection;
 using System.Text.Json.Serialization;
-using DataStarTester.Models.Todos;
 
 namespace DataStarTester.Views.Home;
 
@@ -13,11 +12,6 @@ public record IndexSignals
     [JsonPropertyName("output")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Output { get; init; }
-}
-
-public static class InMemoryDb
-{
-    public static TodoBl.TodoState CurrentState { get; set; } = TodoBl.InitialState;
 }
 
 public static class IndexEndpoints
